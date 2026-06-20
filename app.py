@@ -1,35 +1,46 @@
 import streamlit as st
 import sqlite3
+import os
 
 st.set_page_config(page_title="Legacy Archive", layout="centered")
+
+# --- UI STYLING ---
+st.markdown("""
+    <style>
+    .card { background:#0a0a0a; border:1px solid #333; padding:20px; border-radius:10px; margin-bottom:20px; }
+    .year { color:#d4af37; font-weight:bold; font-size:1.2rem; }
+    .title { font-size:1.5rem; color:#fff; margin:10px 0; }
+    </style>
+""", unsafe_allow_html=True)
 
 try:
     conn = sqlite3.connect('dad_media_vault.db')
     cursor = conn.cursor()
     
-    # Get all tables, excluding internal ones
-    cursor.execute("SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%';")
-    tables = cursor.fetchall()
+    # Query all data ordered by display_order
+    cursor.execute("SELECT year, title, media_filename, description, metric_label, metric_value FROM timeline_media ORDER BY display_order ASC")
+    rows = cursor.fetchall()
     
-    if not tables:
-        st.error("Database empty or no user tables found.")
-    else:
-        # Use the first user-created table found
-        table_name = tables[0][0]
-        st.sidebar.write(f"Connected to table: {table_name}")
-        
-        # --- SHOW US YOUR COLUMN NAMES ---
-        # This will print the column names so we can see what they are actually called
-        cursor.execute(f"PRAGMA table_info({table_name})")
-        columns = [info[1] for info in cursor.fetchall()]
-        st.write(f"Columns found in {table_name}: {columns}")
-        
-        # Fetch data using the columns we now know exist
-        cursor.execute(f"SELECT * FROM {table_name}")
-        rows = cursor.fetchall()
-        
-        st.write("First row of data:", rows[0] if rows else "No data")
+    st.markdown("<h1 style='text-align:center;'>The Legacy Archive</h1>", unsafe_allow_html=True)
 
+    for row in rows:
+        year, title, filename, desc, m_lbl, m_val = row
+        
+        st.markdown(f"<div class='card'>", unsafe_allow_html=True)
+        st.markdown(f"<div class='year'>{year}</div>", unsafe_allow_html=True)
+        st.markdown(f"<div class='title'>{title}</div>", unsafe_allow_html=True)
+        
+        # Display image from static/photos folder
+        img_path = os.path.join("static", "photos", filename)
+        if os.path.exists(img_path):
+            st.image(img_path, use_container_width=True)
+        else:
+            st.warning(f"Could not find image: {filename}")
+            
+        st.write(desc)
+        st.caption(f"{m_lbl}: {m_val}")
+        st.markdown("</div>", unsafe_allow_html=True)
+            
     conn.close()
 except Exception as e:
     st.error(f"Error: {e}")
