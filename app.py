@@ -12,6 +12,7 @@ st.markdown("""
     @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,600;1,600&family=Montserrat:wght@300&display=swap');
     .stApp { background-color: #050505; }
     .block-container { max-width: 500px !important; }
+    
     .royal-title { font-family: 'Cormorant Garamond', serif; font-size: 2.8rem; color: #d4af37; text-align: center; margin-bottom: 5px; }
     .sub-heading { font-family: 'Montserrat', sans-serif; font-size: 0.9rem; color: #888; text-align: center; letter-spacing: 4px; text-transform: uppercase; margin-bottom: 30px; }
     .card { background: #0a0a0a; border-bottom: 1px solid #1a1a1a; padding: 10px 0; margin-bottom: 40px; }
@@ -32,6 +33,7 @@ try:
     rows = cursor.fetchall()
 
     folder_path = os.path.join("static", "photos")
+    # Case-insensitive mapping
     available_files = {f.lower(): f for f in os.listdir(folder_path)}
 
     for row in rows:
