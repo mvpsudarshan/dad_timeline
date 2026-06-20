@@ -67,7 +67,10 @@ try:
         
         if filename.lower() in available_files:
             actual_filename = available_files[filename.lower()]
+            # Using HTML div to force center alignment
+            st.markdown("<div style='display: flex; justify-content: center;'>", unsafe_allow_html=True)
             st.image(os.path.join(folder_path, actual_filename), use_container_width=True)
+            st.markdown("</div>", unsafe_allow_html=True)
             
         st.markdown(f"<p style='color:#ccc; font-family:Montserrat; font-size: 0.9rem; line-height: 1.5;'>{desc}</p>", unsafe_allow_html=True)
         st.caption(f"{m_lbl}: {m_val}")
